@@ -64,7 +64,7 @@ namespace OrderProductList.Repositories
                 foreach(var od in orders)
                 {
                     var qry1 = "select * from tblProduct where orderId=@id";
-                    var product=await connection.QueryAsync<Product>(qry1, od.orderId);
+                    var product=await connection.QueryAsync<Product>(qry1,new { id = od.orderId });
                     od.products = product.ToList();
                 }
                 return orders;
@@ -78,13 +78,12 @@ namespace OrderProductList.Repositories
             var qry = "select * from tblOrder where orderId=@orderId";
             using (var connection=_context.CreateConnection())
             {
-                var ord=await connection.QueryFirstAsync<Order>(qry, new {orderId=id});
-                if(ord != null)
-                {
+                 order=await connection.QueryFirstOrDefaultAsync<Order>(qry, new {orderId=id});
+                
                     var qry1 = "select * from tblProduct where orderId=@id";
-                    var product=await connection.QueryAsync<Product>(qry1, new {id=ord.orderId});
+                    var product=await connection.QueryAsync<Product>(qry1, new {id=id});
                     order.products=product.ToList();
-                }
+                
                 return order;
             }
         }
